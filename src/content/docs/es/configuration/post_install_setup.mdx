@@ -195,6 +195,26 @@ Habilita Cachy-Update en CachyOS Hello > Apps/Tweaks > Cachy Update enabled
 
 Gracias a [Antiz](https://github.com/Antiz96) por mantener el proyecto upstream Arch-Update y por la implementación de Cachy-Update
 
+- Cómo cambiar el intervalo de comprobación de actualizaciones:
+
+```sh title='Ejecute el siguiente comando'
+systemctl --user edit --full arch-update.timer
+# Consejo: También puede usar cualquier editor de texto en lugar de `nano`
+# p. ej. EDITOR=micro systemctl --user edit --full arch-update.timer
+```
+Contenido predeterminado del archivo:
+```systemd
+[Timer]
+OnStartupSec=15 # Check for updates 15 seconds after boot
+OnUnitActiveSec=1h # Check for updates every hour
+```
+
+Básicamente, puede cambiar el valor de `OnUnitActiveSec` a su gusto. Por ejemplo, si desea comprobar actualizaciones cada 30 minutos, cámbielo a `30m`. O cada 6 horas, cámbielo a `6h`. Consulta este [documento](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans) para obtener más información sobre cómo configurar el intervalo de tiempo.
+
+Si quieres que Cachy-Update busque nuevas actualizaciones solo una vez al arrancar, puedes eliminar la línea `OnUnitActiveSec` por completo.
+
+Gracias a [Antiz](https://github.com/Antiz96) por mantener el proyecto Arch-Update y por la implementación de Cachy-Update.
+
 </TabItem>
 
 </Tabs>
@@ -411,3 +431,43 @@ Esta herramienta es extremadamente útil para aquellos que no quieren leer mucho
    ```
 
 </Steps>
+
+
+## Administración de AppImages
+
+Las AppImages son aplicaciones portables que se ejecutan en la mayoría de las distribuciones de Linux sin necesidad de instalación ni permisos de root.
+
+:::note[Todas las AppImages requieren permisos de ejecución.]
+Puede configurar los permisos de ejecución con el siguiente comando:
+```sh
+chmod +x /path/to/your/appimage
+```
+
+O haga clic derecho en el archivo AppImage, vaya a `Propiedades` > `Permisos` y marque la casilla `Permitir ejecutar el archivo como programa`.
+:::
+
+:::note[Antes de ejecutar AppImages, asegúrese de que FUSE (Sistema de archivos en el espacio de usuario) esté instalado en su sistema.]
+```sh
+sudo pacman -S fuse2
+```
+:::
+
+Para administrar AppImages, puede usar [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher), que ofrece una forma sencilla de integrar AppImages en su sistema. 
+<Tabs>
+   <TabItem label='Usando AppImageLauncher (GUI)'>
+   AppImageLauncher es una herramienta gráfica que simplifica la administración de AppImages en su sistema. Se integra con su entorno de escritorio, facilitando su ejecución y administración.
+         <Steps>
+         1. Instale AppImageLauncher:
+            ```sh
+            sudo pacman -S appimagelauncher
+            ```
+         2. Descargue la AppImage que desee de una fuente confiable.
+
+         3. Haga doble clic en el archivo AppImage descargado. AppImageLauncher le solicitará que integre la aplicación en su sistema.
+
+         4. Siga las instrucciones para completar el proceso de integración.
+
+         5. Una vez integrada, puede iniciar la aplicación desde el menú de aplicaciones o haciendo doble clic en el archivo AppImage.
+         </Steps>
+   </TabItem>
+</Tabs>
