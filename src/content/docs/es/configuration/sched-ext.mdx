@@ -66,31 +66,30 @@ cambiar de perfil, ejecutar programadores en modos específicos o automatizar ta
 
 <Tabs>
     <TabItem label='Iniciando un programador'>
-            ```sh title='Iniciando scx_flash en modo Gaming'
-            scxctl start --sched flash --mode gaming
-            ```
-        </TabItem>
-        <TabItem label='Deteniendo un planificador'>
-            ```sh title='Deteniendo el planificador actualmente en ejecución'
-            scxctl stop
-            ```
-        </TabItem>
-        <TabItem label='Cambiando de planificador'>
-            ```sh title='Cambiando a scx_bpfland en modo Gaming'
-            scxctl switch --sched bpfland --mode gaming
-            ```
-        </TabItem>
-        <TabItem label='Iniciando y Cambiando con argumentos personalizados'>
-            ```sh title='Iniciando scx_rustland con argumentos personalizados'
-            :::note[Añadir una coma entre cada argumento]
-            Ejemplo: `--args="-c,75,-m,0-15"` = Argumento, Valor
-            :::
-            ```sh title='Iniciando scx_cosmos con argumentos personalizados'
-            scxctl start --sched cosmos --args="-c,75,-m,0-15"          
-            ```
-            ```sh title='Cambiando a scx_flash con argumentos personalizados'
-            scxctl switch --sched flash --args="-s,20000"
-            ```
+          ```sh title='Iniciando scx_flash en modo Gaming'
+          scxctl start --sched flash --mode gaming
+          ```
+    </TabItem>
+    <TabItem label='Deteniendo un planificador'>
+          ```sh title='Deteniendo el planificador actualmente en ejecución'
+          scxctl stop
+          ```
+    </TabItem>
+    <TabItem label='Cambiando de planificador'>
+          ```sh title='Cambiando a scx_bpfland en modo Gaming'
+          scxctl switch --sched bpfland --mode gaming
+          ```
+    </TabItem>
+    <TabItem label='Iniciando y Cambiando con argumentos personalizados'>
+          :::note[Añadir una coma entre cada argumento]
+          Ejemplo: `--args="-c,75,-m,0-15"` = Argumento, Valor
+          :::
+          ```sh title='Iniciando scx_cosmos con argumentos personalizados'
+          scxctl start --sched cosmos --args="-c,75,-m,0-15"          
+          ```
+          ```sh title='Cambiando a scx_flash con argumentos personalizados'
+          scxctl switch --sched flash --args="-s,20000"
+          ```
     </TabItem>
 </Tabs>
 
@@ -490,28 +489,7 @@ systemctl disable --now ananicy-cpp
 
 La herramienta [cachyos-benchmarker](https://github.com/CachyOS/cachyos-benchmarker) ofrece una forma sencilla de evaluar y comparar el rendimiento de diferentes programadores de CPU.
 
-Ejecuta un conjunto completo de pruebas comparativas para medir el rendimiento de la CPU, la memoria y el sistema general bajo diversas cargas de trabajo.
-
-`cachyos-benchmarker` se puede utilizar para varios fines, incluyendo:
-
-- **Probar la estabilidad del programador**
-Ejecuta el conjunto completo de pruebas comparativas para detectar bloqueos, fallos o regresiones causados ​​por cambios en el programador.
-Si usa `scx_loader`, puede recopilar registros en caso de bloqueo o fallo con:
-```bash
-journalctl --unit scx_loader.service --boot 0 > crash.log
-```
-Esto creará un archivo llamado `crash.log` en su directorio actual. - **Comparación del rendimiento del programador**
-- Evaluación de las diferencias de rendimiento entre programadores
-- Ejemplo: `LAVD vs BPFLAND`
-- **Medición del efecto de las actualizaciones del kernel o del programador**
-- Comparación de ejecuciones antes y después de aplicar parches o cambios de versión para comprobar si hay regresiones o mejoras en el rendimiento.
-- **Prueba de ajustes de configuración**
-- Evaluación del impacto de cambios como la configuración del regulador de CPU, la activación/desactivación de SMT o la modificación de los indicadores del programador.
-
-Requisitos:
-- Al menos **4 GB de RAM**
-- Al menos **30 GB de almacenamiento libre**
-- Tiempo y paciencia - **La prueba de rendimiento completa puede tardar más de una hora en sistemas lentos**
+Ejecuta un conjunto completo de pruebas comparativas para medir el rendimiento de la CPU, la memoria y el sistema general bajo diversas cargas de trabajo..
 
 Se incluyen las siguientes pruebas de rendimiento:
 
@@ -532,15 +510,13 @@ Se incluyen las siguientes pruebas de rendimiento:
 `cachyos-benchmarker` se puede usar para varios propósitos, incluyendo:
 
 - **Probar la estabilidad del programador**
+  Ejecute el conjunto completo de pruebas de rendimiento para detectar bloqueos, fallos o regresiones ocasionadas por cambios en el programador.
+  Si usa `scx_loader`, puede recopilar registros en caso de bloqueo o fallo con:
+  ```bash
+  journalctl --unit scx_loader.service --boot 0 > crash.log
+  ```
 
-Ejecute el conjunto completo de pruebas de rendimiento para detectar bloqueos, fallos o regresiones ocasionadas por cambios en el programador.
-
-Si usa `scx_loader`, puede recopilar registros en caso de bloqueo o fallo con:
-```bash
-journalctl --unit scx_loader.service --boot 0 > crash.log
-```
-
-Esto creará un archivo llamado `crash.log` en su directorio actual.
+  Esto creará un archivo llamado `crash.log` en su directorio actual.
 
 - **Comparar el rendimiento del programador**
 
@@ -565,69 +541,70 @@ sudo pacman -S cachyos-benchmarker
 
 #### Ejecución del benchmark
 
-<Pasos>
-1. Ejecute `cachyos-benchmarker:`
-```bash
-cachyos-benchmarker ~/cachyos-benchmarker/
-# Puede reemplazar ~/cachyos-benchmarker/ con cualquier directorio donde desee guardar los registros.
-```
-2. Espere a que finalicen los pasos de preparación.
-3. Siga las instrucciones:
-- `¿Desea eliminar la caché de página ahora? ¡Se requieren privilegios de root! (s/n) s`
-- `Por favor, introduzca un nombre para esta ejecución o deje el valor predeterminado en blanco:`
-4. Espere a que finalicen las pruebas.
-5. Una vez finalizado, ocurrirá lo siguiente:
-- Se creará un archivo de registro con el nombre `benchie_<nombre>_<FECHA>.log`, que contiene información detallada sobre la ejecución del benchmark.
-- Ejemplo: `benchie_p2dq_2025-09-29-2115.log`
-- El script `benchmark_scraper.py` se ejecutará automáticamente para generar un informe resumido en formato HTML.
-- ¿Qué hace el script?:
-- Lee todos los archivos `benchie_*.log` del directorio especificado.
-- Extrae los nombres, tiempos y puntuaciones del benchmark.
-- Los ordena o agrega.
-- Imprime un resumen limpio de los resultados en tu terminal y crea un archivo HTML que se puede abrir en un navegador. <details>
-<summary>Ejemplo de salida de terminal:</summary>
-```texto
-stress-ng cpu-cache-mem: 15.26
-y-cruncher pi 1b: 31.23
-perf sched msg fork thread: 8.892
-perf memcpy: 13.53
-namd 92K atoms: 53.54
-cálculo de números primos: 11.126
-hash argon2: 6.62
-compilación ffmpeg: 53.38
-compresión xz: 61.13
-defconfig del kernel: 130.73
-renderizado de Blender: 96.29
-codificación x265: 24.99
+<Steps>
+    1. Ejecute `cachyos-benchmarker:`
+        ```bash
+        cachyos-benchmarker ~/cachyos-benchmarker/
+        # Puede reemplazar ~/cachyos-benchmarker/ con cualquier directorio donde desee guardar los registros.
+        ```
+    2. Espere a que finalicen los pasos de preparación.
+    3. Siga las instrucciones:
+    - `¿Desea eliminar la caché de página ahora? ¡Se requieren privilegios de root! (s/n) s`
+    - `Por favor, introduzca un nombre para esta ejecución o deje el valor predeterminado en blanco:`
+    4. Espere a que finalicen las pruebas.
+    5. Una vez finalizado, ocurrirá lo siguiente:
+        - Se creará un archivo de registro con el nombre `benchie_<nombre>_<FECHA>.log`, que contiene información detallada sobre la ejecución del benchmark.
+          - Ejemplo: `benchie_p2dq_2025-09-29-2115.log`
+          - El script `benchmark_scraper.py` se ejecutará automáticamente para generar un informe resumido en formato HTML.
+          - ¿Qué hace el script?:
+            - Lee todos los archivos `benchie_*.log` del directorio especificado.
+            - Extrae los nombres, tiempos y puntuaciones del benchmark.
+            - Los ordena o agrega.
+            - Imprime un resumen limpio de los resultados en tu terminal y crea un archivo HTML que se puede abrir en un navegador.         
+                <details>
+                <summary>Ejemplo de salida de terminal:</summary>
+                ```text
+                stress-ng cpu-cache-mem: 15.26
+                y-cruncher pi 1b: 31.23
+                perf sched msg fork thread: 8.892
+                perf memcpy: 13.53
+                namd 92K atoms: 53.54
+                calculating prime numbers: 11.126
+                argon2 hashing: 6.62
+                ffmpeg compilation: 53.38
+                xz compression: 61.13
+                kernel defconfig: 130.73
+                blender render: 96.29
+                x265 encoding: 24.99
 
-Tiempo total (s): 506.72
-Puntuación total: 70.71
+                Total time (s): 506.72
+                Total score: 70.71
 
-Nombre: p2dq
-Fecha: 2025-09-29-2115 
+                Name: p2dq
+                Date: 2025-09-29-2115
 
-Sistema: Kernel: 6.17.0-1.1-cachyos-p2dq arch: x86_64 bits: 64 
-Escritorio: KDE Plasma v: 6.4.5 Distribución: CachyOS 
-Memoria: RAM del sistema: Total: 32 GiB disponibles: 30,61 GiB usados: 7,54 GiB (24,6%)
-Dispositivo 1: Canal A DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
-Dispositivo 2: Canal B DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
-Dispositivo 3: Canal C DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
-Dispositivo 4: Canal D DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
-CPU: Información: Modelo de 8 núcleos: AMD Ryzen 7 8845HS con Radeon 780M, bits gráficos: 64, tipo: MT, caché MCP: L2: 8 MiB
-Velocidad (MHz): media: 3366, mín./máx. 419/5138 núcleos: 1: 3366 2: 3366 3: 3366 4: 3366 5: 3366 6: 3366 7: 3366 8: 3366 9: 3366 10: 3366 11: 3366 12: 3366 13: 3366 14: 3366 15: 3366 16: 3366
+                System:    Kernel: 6.17.0-1.1-cachyos-p2dq arch: x86_64 bits: 64
+                           Desktop: KDE Plasma v: 6.4.5 Distro: CachyOS
+                Memory:    System RAM: total: 32 GiB available: 30.61 GiB used: 7.54 GiB (24.6%)
+                           Device-1: Channel-A DIMM 0 type: LPDDR5 size: 8 GiB speed: 7500 MT/s
+                           Device-2: Channel-B DIMM 0 type: LPDDR5 size: 8 GiB speed: 7500 MT/s
+                           Device-3: Channel-C DIMM 0 type: LPDDR5 size: 8 GiB speed: 7500 MT/s
+                           Device-4: Channel-D DIMM 0 type: LPDDR5 size: 8 GiB speed: 7500 MT/s
+                CPU:       Info: 8-core model: AMD Ryzen 7 8845HS w/ Radeon 780M Graphics bits: 64 type: MT MCP cache: L2: 8 MiB
+                           Speed (MHz): avg: 3366 min/max: 419/5138 cores: 1: 3366 2: 3366 3: 3366 4: 3366 5: 3366 6: 3366 7: 3366 8: 3366 9: 3366 10: 3366 11: 3366 12: 3366 13: 3366 14: 3366 15: 3366 16: 3366
 
-Programador SCX: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
+                SCX Scheduler: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
 
-Versión SCX: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
+                SCX Version: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
 
-Versión: 0.5.1-1
-```
-</details>
-<details>
-<summary>Ejemplo HTML del resultado de una prueba que compara dos ramas diferentes del mismo planificador:</summary>
-<ImageComponent imgsrc={import('~/assets/images/cachyos-benchmarker-example.png')} />
-</details>
-6. Para comparar dos o más ejecuciones, coloque los archivos `.log` en el mismo directorio antes de ejecutar `benchmark_scraper.py`. La herramienta los detectará y comparará automáticamente en el informe HTML.
+                 Version         : 0.5.1-1
+                ```
+                </details>
+                <details>
+                <summary>Ejemplo HTML del resultado de una prueba que compara dos ramas diferentes del mismo planificador:</summary>
+                <ImageComponent imgsrc={import('~/assets/images/cachyos-benchmarker-example.png')} />
+                </details>
+    6. Para comparar dos o más ejecuciones, coloque los archivos `.log` en el mismo directorio antes de ejecutar `benchmark_scraper.py`. La herramienta los detectará y comparará automáticamente en el informe HTML.
 </Steps>
 
 ### Prueba de la latencia del planificador con schbench
@@ -688,95 +665,83 @@ A continuación, se muestra una tabla que explica algunas de las opciones clave:
 Después de cada ejecución, `schbench` imprime percentiles de latencia como:
 
 <details>
-    <summary>Output example</summary>
+    <summary>OEjemplo de salida</summary>
 
-        ```bash
-        Latencias de activación percentiles (usec) tiempo de ejecución 10 (s) (2406 muestras en total)
-
-        50.0: 60 (648 muestras)
-
-        90.0: 2034 (968 muestras)
-        * 99.0: 4104 (211 muestras)
-
-        99.9: 10128 (22 muestras)
-
-        mín.=1, máx.=10308
-        Latencias de solicitud percentiles (usec) tiempo de ejecución 10 (s) (2394 muestras en total)
-
-        50.0: 49216 (726 muestras)
-
-        90.0: 69760 (954 muestras)
-        * 99.0: 166656 (212 Muestras)
-        99.9: 273920 (21 muestras)
-        mín. = 11770, máx. = 334247
-        Percentiles de RPS (solicitudes), tiempo de ejecución: 10 (s) (11 muestras en total)
-        20.0: 234 (3 muestras)
-        * 50.0: 238 (3 muestras)
-        90.0: 241 (4 muestras)
-        mín. = 230, máx. = 248
-        RPS actuales: 230,99
-        Latencias de activación, percentiles (usec), tiempo de ejecución: 10 (s) (2406 muestras en total)
-
-        50.0: 60 (648 muestras)
-
-        90.0: 2034 (968 muestras)
-        *
-        99.0: 4104 (211 muestras)
-
-        99.9: 10128 (22 muestras)
-
-        mín. = 1, máx. = 10308
-        Latencias de solicitud, percentiles (usec), tiempo de ejecución: 10 (s) (2406 muestras en total)
-
-        50.0: 49216 (729 muestras)
-
-        90.0: 69760 (956 muestras)
-        *
-        99.0: 165632 (212 muestras)
-
-        99.9: 273920 (22 muestras)
-        mín.=11770, máx.=334247
-        Percentiles de RPS (solicitudes) tiempo de ejecución: 10 (s) (11 muestras en total)
-        20.º: 234 (3 muestras)
-        * 50.º: 238 (3 muestras)
-        90.º: 241 (4 muestras)
-        mín.=230, máx.=248
-        RPS promedio: 240,60
-        ```
+    ```bash
+    Wakeup Latencies percentiles (usec) runtime 10 (s) (2406 total samples)
+	  50.0th: 60         (648 samples)
+	  90.0th: 2034       (968 samples)
+	* 99.0th: 4104       (211 samples)
+	  99.9th: 10128      (22 samples)
+	  min=1, max=10308
+    Request Latencies percentiles (usec) runtime 10 (s) (2394 total samples)
+	  50.0th: 49216      (726 samples)
+	  90.0th: 69760      (954 samples)
+	* 99.0th: 166656     (212 samples)
+	  99.9th: 273920     (21 samples)
+	  min=11770, max=334247
+    RPS percentiles (requests) runtime 10 (s) (11 total samples)
+	  20.0th: 234        (3 samples)
+	* 50.0th: 238        (3 samples)
+	  90.0th: 241        (4 samples)
+	  min=230, max=248
+    current rps: 230.99
+    Wakeup Latencies percentiles (usec) runtime 10 (s) (2406 total samples)
+	  50.0th: 60         (648 samples)
+	  90.0th: 2034       (968 samples)
+	* 99.0th: 4104       (211 samples)
+	  99.9th: 10128      (22 samples)
+	  min=1, max=10308
+    Request Latencies percentiles (usec) runtime 10 (s) (2406 total samples)
+	  50.0th: 49216      (729 samples)
+	  90.0th: 69760      (956 samples)
+	* 99.0th: 165632     (212 samples)
+	  99.9th: 273920     (22 samples)
+	  min=11770, max=334247
+    RPS percentiles (requests) runtime 10 (s) (11 total samples)
+	  20.0th: 234        (3 samples)
+	* 50.0th: 238        (3 samples)
+	  90.0th: 241        (4 samples)
+	  min=230, max=248
+    average rps: 240.60
+    ```
   </details>
 
 ##### Cómo interpretar los resultados
 
 - **Latencias de activación:**
-- Mide la rapidez con la que los subprocesos se activan tras recibir una señal.
-- Valores más bajos (especialmente el **percentil 99**) indican una mayor capacidad de respuesta del programador.
+  - Mide la rapidez con la que los subprocesos se activan tras recibir una señal.
+    - Valores más bajos (especialmente el **percentil 99**) indican una mayor capacidad de respuesta del programador.
 - **Latencias de solicitud:**
-- Representa el tiempo que tarda en completarse una solicitud entre subprocesos.
-- Una latencia más baja indica una mejor comunicación entre subprocesos y una mayor eficiencia de programación. - **RPS (Solicitudes por segundo):**
-- Muestra el rendimiento sostenido:
-- Un **RPS promedio** más alto indica que el programador puede gestionar más trabajo por segundo con la configuración dada.
+  - Representa el tiempo que tarda en completarse una solicitud entre subprocesos.
+    - Una latencia más baja indica una mejor comunicación entre subprocesos y una mayor eficiencia de programación. 
+- **RPS (Solicitudes por segundo):**
+  - Muestra el rendimiento sostenido:
+    - Un **RPS promedio** más alto indica que el programador puede gestionar más trabajo por segundo con la configuración dada.
 
 En conclusión:
 - Un **buen programador** mostrará **latencias de activación y solicitud bajas** con **RPS constantes**.
 - Un programador **menos eficiente** puede presentar **picos de latencia altos** o **valores de RPS inestables** con el tiempo.
 
-::nota
+:::note
 Estos resultados pueden variar según la CPU, el número de núcleos, la carga del sistema y si el programador es capaz de gestionar la arquitectura de su CPU de forma eficiente.
-::
+:::
 
 ### Recomendaciones para realizar benchmarks de juegos
 
 Si desea realizar benchmarks de juegos para comparar el rendimiento de diferentes programadores, aquí tiene algunos consejos para obtener los resultados más precisos:
 
-- **Utilice benchmarks integrados:** Muchos juegos modernos incluyen herramientas de benchmarking integradas. Estas están diseñadas para proporcionar resultados consistentes ejecutando la misma secuencia de eventos cada vez. - Consulta este [sitio web](https://www.pcgamingwiki.com/wiki/List_of_games_with_built-in_benchmarks) para ver una lista de juegos que incluyen benchmarks integrados.
+- **Utilice benchmarks integrados:** Muchos juegos modernos incluyen herramientas de benchmarking integradas. Estas están diseñadas para proporcionar resultados consistentes ejecutando la misma secuencia de eventos cada vez. 
+  - Consulta este [sitio web](https://www.pcgamingwiki.com/wiki/List_of_games_with_built-in_benchmarks) para ver una lista de juegos que incluyen benchmarks integrados.
 - **Configuración consistente:** Asegúrate de que la configuración del juego (resolución, calidad gráfica, etc.) sea la misma en cada ejecución de prueba.
 - **Cierra aplicaciones en segundo plano:** Otras aplicaciones ejecutándose en segundo plano pueden afectar el rendimiento. Cierra los programas innecesarios para minimizar su impacto.
 - Si no utilizas un benchmark integrado, intenta realizar las mismas acciones en el juego en cada ejecución de prueba. Esto podría incluir seguir la misma ruta, participar en escenarios de combate similares o realizar las mismas tareas.
-- Incluso no apuntar al mismo punto puede generar resultados de rendimiento diferentes.
+  - Incluso no apuntar al mismo punto puede generar resultados de rendimiento diferentes.
 - **Ejecuciones múltiples:** Realiza varias ejecuciones del benchmark y calcula el promedio para tener en cuenta la variabilidad.
-- **Usa herramientas de monitorización del rendimiento:** Herramientas como MangoHud o GOverlay pueden proporcionar métricas de rendimiento en tiempo real, como FPS, tiempos de fotogramas y uso de CPU/GPU. - **Aprovecha los atajos de teclado o macros:**
-- Un ejemplo es crear una combinación de teclas que te permita cambiar entre diferentes programadores o sus modos sobre la marcha durante el juego.
-- Esto se puede hacer usando una herramienta como [scxctl](/configuration/sched-ext#how-to-launch-and-manage-the-scheduler) o creando scripts personalizados que cambien el programador activo y su modo.
+- **Usa herramientas de monitorización del rendimiento:** Herramientas como MangoHud o GOverlay pueden proporcionar métricas de rendimiento en tiempo real, como FPS, tiempos de fotogramas y uso de CPU/GPU. 
+- **Aprovecha los atajos de teclado o macros:**
+  - Un ejemplo es crear una combinación de teclas que te permita cambiar entre diferentes programadores o sus modos sobre la marcha durante el juego.
+    - Esto se puede hacer usando una herramienta como [scxctl](/configuration/sched-ext#how-to-launch-and-manage-the-scheduler) o creando scripts personalizados que cambien el programador activo y su modo.
 
 #### Subir y compartir tus benchmarks
 
@@ -921,7 +886,8 @@ Asegúrese de que está utilizando la versión más reciente del paquete scx-sch
 
 :::note[Créditos]
 Algunos de los enlaces a continuación provienen originalmente del repositorio de GitHub sched-ext (https://github.com/sched-ext/scx?tab=readme-ov-file#sched_ext-schedulers-and-tools).
-Todo el crédito corresponde a los mantenedores y colaboradores de sched-ext por seleccionar y compartir estos excelentes recursos. :::
+Todo el crédito corresponde a los mantenedores y colaboradores de sched-ext por seleccionar y compartir estos excelentes recursos. 
+:::
 
 - [Lista de reproducción de YouTube Sched_ext](https://youtube.com/playlist?list=PLLLT4NxU7U1TnhgFH6k57iKjRu6CXJ3yB&si=DETiqpfwMoj8Anvl)
 - [LWN: La clase de programador extensible (febrero de 2023)](https://lwn.net/Articles/922405/)
