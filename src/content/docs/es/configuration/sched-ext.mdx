@@ -1,14 +1,21 @@
 ---
 title: Tutorial de sched-ext
 description: Tutorial sobre cómo usar el framework e información variada
+tableOfContents:
+  minHeadingLevel: 1
+  maxHeadingLevel: 5
 ---
 
 import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 import { Icon } from '@astrojs/starlight/components';
+import ImageComponent from '~/components/image-component.astro';
 
 Extensible Scheduler Class (mejor conocido como `sched-ext`) es una característica del kernel de Linux que permite implementar planificadores de CPUs del kernel en
 BPF (Berkeley Packet Filter) y cargarlos dinámicamente. Esencialmente, esto permite a los usuarios finales cambiar sus planificadores en el espacio de usuario sin
 la necesidad de compilar otro kernel solo para tener un planificador diferente.
+
+:::tip[Ponte en contacto con los desarrolladores en su [servidor de Discord](https://discord.gg/b2J8DrWa7t)]
+:::
 
 - *Los planificadores se pueden encontrar en los paquetes `scx-scheds` y `scx-scheds-git`.*
   ```sh
@@ -44,6 +51,11 @@ Para detener el planificador. Presiona `CTRL + C` y el planificador se detendrá
 
 `scxctl` es un cliente DBUS de línea de comandos para interactuar con `scx_loader`.
 
+Dado que **no requiere privilegios de sudo**, puedes administrar los programadores como un usuario normal.
+
+Esto abre posibilidades para configuraciones creativas: por ejemplo, puedes crear atajos de teclado o scripts para 
+cambiar de perfil, ejecutar programadores en modos específicos o automatizar tareas, todo sin necesidad de acceso root.
+
 - Características:
   - Obtener el planificador y el modo actual
   - Listar todos los planificadores disponibles
@@ -52,53 +64,57 @@ Para detener el planificador. Presiona `CTRL + C` y el planificador se detendrá
   - Detener el planificador en ejecución
   - Reiniciar el planificador en ejecución
 
+<Tabs>
+    <TabItem label='Iniciando un programador'>
+            ```sh title='Iniciando scx_flash en modo Gaming'
+            scxctl start --sched flash --mode gaming
+            ```
+        </TabItem>
+        <TabItem label='Deteniendo un planificador'>
+            ```sh title='Deteniendo el planificador actualmente en ejecución'
+            scxctl stop
+            ```
+        </TabItem>
+        <TabItem label='Cambiando de planificador'>
+            ```sh title='Cambiando a scx_bpfland en modo Gaming'
+            scxctl switch --sched bpfland --mode gaming
+            ```
+        </TabItem>
+        <TabItem label='Iniciando y Cambiando con argumentos personalizados'>
+            ```sh title='Iniciando scx_rustland con argumentos personalizados'
+            :::note[Añadir una coma entre cada argumento]
+            Ejemplo: `--args="-c,75,-m,0-15"` = Argumento, Valor
+            :::
+            ```sh title='Iniciando scx_cosmos con argumentos personalizados'
+            scxctl start --sched cosmos --args="-c,75,-m,0-15"          
+            ```
+            ```sh title='Cambiando a scx_flash con argumentos personalizados'
+            scxctl switch --sched flash --args="-s,20000"
+            ```
+    </TabItem>
+</Tabs>
+
 ```sh
 $ scxctl --help
 Usage: scxctl <COMMAND>
 
 Commands:
-  get     Obtiene el planificador y modo actual
-  list    Lista todos los planificadores soportados
-  start   Inicia un planificador en un modo o con argumentos
-  switch  Cambia de planificador o modo, opcionalmente con argumentos
-  stop    Detiene el planificador actual
-  restart Reinicia el planificador actual con la configuración original
-  help    Imprime este mensaje o la ayuda del subcomando(s) dado(s)
+  get     Get the current scheduler and mode
+  list    List all supported schedulers
+  start   Start a scheduler in a mode or with arguments
+  switch  Switch schedulers or modes, optionally with arguments
+  stop    Stop the current scheduler
+  restart Restart the current scheduler with original configuration
+  help    Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help     Imprimir ayuda
-  -V, --version  Imprimir versión
+  -h, --help     Print help
+  -V, --version  Print version
 ```
-
-    <Tabs>
-        <TabItem label='Iniciando un planificador'>
-          ```sh title='Iniciando scx_flash en modo Gaming'
-          scxctl start --sched flash --mode gaming
-          ```
-        </TabItem>
-        <TabItem label='Deteniendo un planificador'>
-          ```sh title='Deteniendo el planificador actualmente en ejecución'
-          scxctl stop
-          ```
-        </TabItem>
-        <TabItem label='Cambiando de planificador'>
-          ```sh title='Cambiando a scx_bpfland en modo Gaming'
-          scxctl switch --sched bpfland --mode gaming
-          ```
-        </TabItem>
-        <TabItem label='Iniciando y Cambiando con argumentos personalizados'>
-          ```sh title='Iniciando scx_rustland con argumentos personalizados'
-          scxctl start --sched rustland --args="-m performance -w"
-          ```
-          ```sh title='Cambiando a scx_lavd con argumentos personalizados'
-          scxctl switch --sched lavd --args="--performance"
-          ```
-        </TabItem>
-    </Tabs>
 
 </TabItem>
 
-<TabItem label='scx_loader'>
+<TabItem label='scx_loader (DBus)'>
 
 *Como su nombre indica, es una utilidad que funciona como cargador y gestor para el framework sched-ext usando la interfaz D-Bus.*
 
@@ -150,7 +166,26 @@ Ejemplo: LAVD ejecutándose en Modo 1 es el equivalente de `scx_lavd --performan
 
 <TabItem label='CachyOS Kernel Manager'>
 
-Los planificadores scx pueden ser accedidos y configurados usando el [scx_loader](/es/features/kernel_manager#gestión-del-framework-sched-ext).
+Puede acceder a ellos y configurarlos mediante el botón "sched-ext scheduler config".
+
+</TabItem>
+
+<TabItem label='SCX Manager'>
+
+SCX Manager es una herramienta GUI independiente derivada del Kernel Manager de CachyOS. Permite a los usuarios administrar el framework sched-ext y sus programadores mediante `scx_loader`.
+
+Características:
+- Verificar qué programador está activo actualmente
+- Seleccionar un programador o perfil: (Automático, Juegos, Ahorro de energía, Baja latencia o Servidor)
+- Establecer indicadores adicionales
+- Deshabilitar el programador actual
+
+<details>
+<summary>Captura de pantalla</summary>
+
+<ImageComponent imgsrc={import('~/assets/images/scx-manager-main.png')} />
+
+</details>
 
 </TabItem>
 
@@ -166,11 +201,11 @@ Estos planificadores están en constante desarrollo mientras se prueban, así qu
 
 Siéntete libre de reportar cualquier problema o comentario en el repositorio de su planificador.
 
-**Usa scx_nombreplanificador --help para ver las opciones disponibles para cada planificador.**
-- Ejemplo:
-  ```sh title='Ejemplo de cómo obtener ayuda para scx_rusty'
-  scx_rusty --help
-  ```
+Utilice `scx_schedulername --help` para ver las opciones disponibles y una breve descripción de su función.
+
+```sh title='Ejemplo de cómo obtener ayuda para scx_rusty'
+scx_rusty --help
+```
 
 ### [scx_bpfland](<https://github.com/sched-ext/scx/tree/main/scheds/rust/scx_bpfland>)
 
@@ -278,6 +313,10 @@ Cuando el sistema no está saturado, el planificador prioriza mantener las tarea
 
 - **Conjunto de flags para algunos de los casos de uso recomendados por Andrea Righi:**
 
+**Auto**
+* **Indicadores de línea de comandos:** `-d`
+* **Descripción:** Desactiva las reactivaciones diferidas. Reduce el rendimiento y la productividad de ciertas cargas de trabajo, a la vez que disminuye el consumo de energía.
+
 **Gaming**
 * **Flags de línea de comandos:** `-c 0 -p 0`
 * **Descripción:** Desactiva el seguimiento de la carga de la CPU y siempre impone la planificación basada en plazos para mejorar la capacidad de respuesta.
@@ -364,15 +403,16 @@ una latencia razonable.
 - **Conjunto de flags para algunos de los casos de uso recomendados por Daniel Hodges:**
 
 **Gaming**
-* **Flags de línea de comandos:** `--task-slice true -f --sched-mode performance`
-* **Descripción:** Mejora la consistencia en el rendimiento de los juegos y aumenta la tendencia a planificar en los núcleos de mayor rendimiento.
+* **Banderas de línea de comandos:** `--task-slice true -f --sched-mode performance`
+* **Descripción:** Mejora la consistencia en el rendimiento de los juegos y aumenta la preferencia por la programación en núcleos de mayor rendimiento.
 
-**Baja Latencia**
-* **Flags de línea de comandos:** `-y -f --task-slice true`
-* **Descripción:** Reduce la latencia haciendo que las tareas interactivas se adhieran más a la CPU a la que fueron asignadas y aumentando la estabilidad en el tiempo de la porción (slice).
+**Low Latency**
+
+* **Indicadores de la línea de comandos:** `-y -f --task-slice true`
+* **Descripción:** Reduce la latencia al hacer que las tareas interactivas se mantengan más en la CPU a la que fueron asignadas y al aumentar la estabilidad en el tiempo de segmentación.
 
 **Ahorro de energía**
-* **Flags de línea de comandos:** `--sched-mode efficiency`
+* **Indicadores de la línea de comandos:** `--sched-mode efficiency`
 * **Descripción:** Mejora la eficiencia energética al priorizar los núcleos de bajo consumo.
 
 **Servidor**
@@ -418,7 +458,7 @@ El planificador funciona enrutando todos los eventos de planificación a través
 * **Flags de línea de comandos:** `-f 100`
 * **Descripción:** Reduce la frecuencia con la que el planificador comprueba la contención de la CPU para mejorar el rendimiento a costa de la capacidad de respuesta.
 
-## Recomendaciones generales
+## Pruebas de configuración y rendimiento
 
 ### Piloto automático y Ahorro de energía automático de LAVD
 
@@ -445,6 +485,309 @@ Para desactivar/detener ananicy-cpp, ejecute el siguiente comando:
 ```sh
 systemctl disable --now ananicy-cpp
 ```
+
+### Evaluación comparativa de programadores con cachyos-benchmarker
+
+La herramienta [cachyos-benchmarker](https://github.com/CachyOS/cachyos-benchmarker) ofrece una forma sencilla de evaluar y comparar el rendimiento de diferentes programadores de CPU.
+
+Ejecuta un conjunto completo de pruebas comparativas para medir el rendimiento de la CPU, la memoria y el sistema general bajo diversas cargas de trabajo.
+
+`cachyos-benchmarker` se puede utilizar para varios fines, incluyendo:
+
+- **Probar la estabilidad del programador**
+Ejecuta el conjunto completo de pruebas comparativas para detectar bloqueos, fallos o regresiones causados ​​por cambios en el programador.
+Si usa `scx_loader`, puede recopilar registros en caso de bloqueo o fallo con:
+```bash
+journalctl --unit scx_loader.service --boot 0 > crash.log
+```
+Esto creará un archivo llamado `crash.log` en su directorio actual. - **Comparación del rendimiento del programador**
+- Evaluación de las diferencias de rendimiento entre programadores
+- Ejemplo: `LAVD vs BPFLAND`
+- **Medición del efecto de las actualizaciones del kernel o del programador**
+- Comparación de ejecuciones antes y después de aplicar parches o cambios de versión para comprobar si hay regresiones o mejoras en el rendimiento.
+- **Prueba de ajustes de configuración**
+- Evaluación del impacto de cambios como la configuración del regulador de CPU, la activación/desactivación de SMT o la modificación de los indicadores del programador.
+
+Requisitos:
+- Al menos **4 GB de RAM**
+- Al menos **30 GB de almacenamiento libre**
+- Tiempo y paciencia - **La prueba de rendimiento completa puede tardar más de una hora en sistemas lentos**
+
+Se incluyen las siguientes pruebas de rendimiento:
+
+| Prueba | Medidas | Herramienta |
+| --------------------------- | ---------------------------------------- | ------------ |
+| **stress-ng cpu-cache-mem** | Rendimiento de CPU, caché y memoria | `stress-ng` |
+| **Compilación de FFmpeg** | Rendimiento de compilación paralela | `make` | | **Codificación x265** | Rendimiento de codificación de vídeo | `x265` |
+| **Hash argon2** | Hash de contraseñas multiproceso | `argon2` |
+| **perf sched msg** | Cambio de contexto y rendimiento de IPC | `perf` |
+| **perf memcpy** | Rendimiento de memoria `memcpy()` | `perf` |
+| **Cálculo de primos** | Aritmética de enteros y paralelismo | `primesieve` |
+| **NAMD** | Dinámica molecular (carga de trabajo científica) | `namd3` |
+| **Renderizado de Blender** | Renderizado 3D solo con CPU | `blender` |
+| **Compresión xz** | Rendimiento de compresión | `xz` |
+| **Compilación de defconfig del kernel** | Rendimiento de compilación del kernel | `make` |
+| **y-cruncher** | Precisión matemática y estrés de memoria | `y-cruncher` |
+
+`cachyos-benchmarker` se puede usar para varios propósitos, incluyendo:
+
+- **Probar la estabilidad del programador**
+
+Ejecute el conjunto completo de pruebas de rendimiento para detectar bloqueos, fallos o regresiones ocasionadas por cambios en el programador.
+
+Si usa `scx_loader`, puede recopilar registros en caso de bloqueo o fallo con:
+```bash
+journalctl --unit scx_loader.service --boot 0 > crash.log
+```
+
+Esto creará un archivo llamado `crash.log` en su directorio actual.
+
+- **Comparar el rendimiento del programador**
+
+- Evaluar las diferencias de rendimiento entre programadores. Por ejemplo, `BPFLAND vs. LAVD`
+
+- **Medir el efecto de las actualizaciones del kernel o del programador**
+
+- Comparar las ejecuciones antes y después de aplicar parches o cambios de versión para comprobar si hay regresiones o mejoras en el rendimiento. - **Prueba de ajustes de configuración**
+- Evaluar el impacto de cambios como la configuración del regulador de CPU, la activación/desactivación de SMT o la modificación de los indicadores del programador.
+
+#### Requisitos
+- 4 GB de RAM o más
+- Al menos 8 GB de espacio de almacenamiento libre
+- Tiempo y paciencia - **La evaluación comparativa completa puede tardar más de una hora en sistemas lentos** 
+
+#### Instalación
+
+Para instalar `cachyos-benchmarker`, ejecute el siguiente comando:
+```bash
+sudo pacman -S cachyos-benchmarker
+```
+
+#### Ejecución del benchmark
+
+<Pasos>
+1. Ejecute `cachyos-benchmarker:`
+```bash
+cachyos-benchmarker ~/cachyos-benchmarker/
+# Puede reemplazar ~/cachyos-benchmarker/ con cualquier directorio donde desee guardar los registros.
+```
+2. Espere a que finalicen los pasos de preparación.
+3. Siga las instrucciones:
+- `¿Desea eliminar la caché de página ahora? ¡Se requieren privilegios de root! (s/n) s`
+- `Por favor, introduzca un nombre para esta ejecución o deje el valor predeterminado en blanco:`
+4. Espere a que finalicen las pruebas.
+5. Una vez finalizado, ocurrirá lo siguiente:
+- Se creará un archivo de registro con el nombre `benchie_<nombre>_<FECHA>.log`, que contiene información detallada sobre la ejecución del benchmark.
+- Ejemplo: `benchie_p2dq_2025-09-29-2115.log`
+- El script `benchmark_scraper.py` se ejecutará automáticamente para generar un informe resumido en formato HTML.
+- ¿Qué hace el script?:
+- Lee todos los archivos `benchie_*.log` del directorio especificado.
+- Extrae los nombres, tiempos y puntuaciones del benchmark.
+- Los ordena o agrega.
+- Imprime un resumen limpio de los resultados en tu terminal y crea un archivo HTML que se puede abrir en un navegador. <details>
+<summary>Ejemplo de salida de terminal:</summary>
+```texto
+stress-ng cpu-cache-mem: 15.26
+y-cruncher pi 1b: 31.23
+perf sched msg fork thread: 8.892
+perf memcpy: 13.53
+namd 92K atoms: 53.54
+cálculo de números primos: 11.126
+hash argon2: 6.62
+compilación ffmpeg: 53.38
+compresión xz: 61.13
+defconfig del kernel: 130.73
+renderizado de Blender: 96.29
+codificación x265: 24.99
+
+Tiempo total (s): 506.72
+Puntuación total: 70.71
+
+Nombre: p2dq
+Fecha: 2025-09-29-2115 
+
+Sistema: Kernel: 6.17.0-1.1-cachyos-p2dq arch: x86_64 bits: 64 
+Escritorio: KDE Plasma v: 6.4.5 Distribución: CachyOS 
+Memoria: RAM del sistema: Total: 32 GiB disponibles: 30,61 GiB usados: 7,54 GiB (24,6%)
+Dispositivo 1: Canal A DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
+Dispositivo 2: Canal B DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
+Dispositivo 3: Canal C DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
+Dispositivo 4: Canal D DIMM 0, tipo: LPDDR5, tamaño: 8 GiB, velocidad: 7500 MT/s
+CPU: Información: Modelo de 8 núcleos: AMD Ryzen 7 8845HS con Radeon 780M, bits gráficos: 64, tipo: MT, caché MCP: L2: 8 MiB
+Velocidad (MHz): media: 3366, mín./máx. 419/5138 núcleos: 1: 3366 2: 3366 3: 3366 4: 3366 5: 3366 6: 3366 7: 3366 8: 3366 9: 3366 10: 3366 11: 3366 12: 3366 13: 3366 14: 3366 15: 3366 16: 3366
+
+Programador SCX: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
+
+Versión SCX: p2dq_1.0.21_gf90c2aa1_dirty_x86_64_unknown_linux_gnu
+
+Versión: 0.5.1-1
+```
+</details>
+<details>
+<summary>Ejemplo HTML del resultado de una prueba que compara dos ramas diferentes del mismo planificador:</summary>
+<ImageComponent imgsrc={import('~/assets/images/cachyos-benchmarker-example.png')} />
+</details>
+6. Para comparar dos o más ejecuciones, coloque los archivos `.log` en el mismo directorio antes de ejecutar `benchmark_scraper.py`. La herramienta los detectará y comparará automáticamente en el informe HTML.
+</Steps>
+
+### Prueba de la latencia del planificador con schbench
+
+schbench es una herramienta de referencia para programadores diseñada para medir la latencia del programador bajo una carga de trabajo simulada de tipo servidor. Genera un número configurable de subprocesos de "trabajo"
+y "mensajes", donde los mensajes activan repetidamente a los trabajadores. Al medir la distribución de la latencia desde la activación hasta la ejecución de estos subprocesos de trabajo, proporciona información crucial 
+sobre la capacidad del kernel para gestionar la activación de subprocesos, el balanceo y la contención de la CPU, especialmente bajo carga.
+
+#### Casos de uso
+
+Puede usar `schbench` para:
+
+- **Evaluar la latencia del programador:** Identificar la rapidez con la que se programan los subprocesos tras su activación.
+- **Comparar el rendimiento de la activación entre programadores:** Detectar mejoras o regresiones en el cambio de contexto y la latencia de activación.
+- **Probar el efecto de los parches del kernel o del programador:** Evaluar si los ajustes o las actualizaciones afectan la imparcialidad y la capacidad de respuesta de la programación.
+
+#### Instalación
+
+`schbench` está disponible en los repositorios de CachyOS:
+```bash
+sudo pacman -S schbench
+```
+
+#### Ejecución del benchmark
+
+Una forma sencilla de ejecutar `schbench` para una prueba de latencia general es:
+```bash
+schbench -m 2 -t 8 -r 60
+```
+
+Este ejemplo ejecuta:
+- 2 hilos de mensajes (`-m 2`)
+- 8 hilos de trabajo por hilo de mensajes (`-t 8`)
+- durante 60 segundos de tiempo de ejecución total (`-r 60`)
+
+Puede ajustar estos valores según el número de núcleos de su CPU y el nivel de carga deseado.
+
+A continuación, se muestra una tabla que explica algunas de las opciones clave:
+
+| Opción | Descripción |
+| ---------------------------- | --------------------------------------------------------------- |
+| `-C, --calibrate` | Ejecutar la calibración y el tiempo del informe (sin benchmark). |
+| `-L, --no-locking` | Deshabilitar bloqueos de giro durante el trabajo de la CPU (predeterminado: bloqueo habilitado). |
+| `-m, --message-threads <n>` | Número de hilos de mensajes (predeterminado: 1). |
+| `-t, --threads <n>` | Hilos de trabajo por hilo de mensajes (predeterminado: número de CPU). |
+| `-r, --runtime <sec>` | Duración de la prueba de rendimiento (predeterminado: 30). |
+| `-F, --cache_footprint <KB>` | Tamaño de la huella de caché (predeterminado: 256). |
+| `-n, --operations <count>` | Número de operaciones de "tiempo de reflexión" a realizar (predeterminado: 5). |
+| `-A, --auto-rps` | Aumentar automáticamente los RPS hasta alcanzar el objetivo de utilización de la CPU. |
+| `-R, --rps <count>` | Modo de solicitudes por segundo. |
+| `-p, --pipe <bytes>` | Simular una prueba de transferencia de tubería. |
+| `-w, --warmuptime <seg>` | Duración del calentamiento antes de recopilar estadísticas (predeterminado: 0). |
+| `-i, --intervaltime <seg>` | Intervalo para imprimir latencias (predeterminado: 10). |
+| `-z, --zerotime <seg>` | Intervalo para poner a cero las estadísticas de latencia (predeterminado: nunca). |
+
+#### Entendiendo la salida
+
+Después de cada ejecución, `schbench` imprime percentiles de latencia como:
+
+<details>
+    <summary>Output example</summary>
+
+        ```bash
+        Latencias de activación percentiles (usec) tiempo de ejecución 10 (s) (2406 muestras en total)
+
+        50.0: 60 (648 muestras)
+
+        90.0: 2034 (968 muestras)
+        * 99.0: 4104 (211 muestras)
+
+        99.9: 10128 (22 muestras)
+
+        mín.=1, máx.=10308
+        Latencias de solicitud percentiles (usec) tiempo de ejecución 10 (s) (2394 muestras en total)
+
+        50.0: 49216 (726 muestras)
+
+        90.0: 69760 (954 muestras)
+        * 99.0: 166656 (212 Muestras)
+        99.9: 273920 (21 muestras)
+        mín. = 11770, máx. = 334247
+        Percentiles de RPS (solicitudes), tiempo de ejecución: 10 (s) (11 muestras en total)
+        20.0: 234 (3 muestras)
+        * 50.0: 238 (3 muestras)
+        90.0: 241 (4 muestras)
+        mín. = 230, máx. = 248
+        RPS actuales: 230,99
+        Latencias de activación, percentiles (usec), tiempo de ejecución: 10 (s) (2406 muestras en total)
+
+        50.0: 60 (648 muestras)
+
+        90.0: 2034 (968 muestras)
+        *
+        99.0: 4104 (211 muestras)
+
+        99.9: 10128 (22 muestras)
+
+        mín. = 1, máx. = 10308
+        Latencias de solicitud, percentiles (usec), tiempo de ejecución: 10 (s) (2406 muestras en total)
+
+        50.0: 49216 (729 muestras)
+
+        90.0: 69760 (956 muestras)
+        *
+        99.0: 165632 (212 muestras)
+
+        99.9: 273920 (22 muestras)
+        mín.=11770, máx.=334247
+        Percentiles de RPS (solicitudes) tiempo de ejecución: 10 (s) (11 muestras en total)
+        20.º: 234 (3 muestras)
+        * 50.º: 238 (3 muestras)
+        90.º: 241 (4 muestras)
+        mín.=230, máx.=248
+        RPS promedio: 240,60
+        ```
+  </details>
+
+##### Cómo interpretar los resultados
+
+- **Latencias de activación:**
+- Mide la rapidez con la que los subprocesos se activan tras recibir una señal.
+- Valores más bajos (especialmente el **percentil 99**) indican una mayor capacidad de respuesta del programador.
+- **Latencias de solicitud:**
+- Representa el tiempo que tarda en completarse una solicitud entre subprocesos.
+- Una latencia más baja indica una mejor comunicación entre subprocesos y una mayor eficiencia de programación. - **RPS (Solicitudes por segundo):**
+- Muestra el rendimiento sostenido:
+- Un **RPS promedio** más alto indica que el programador puede gestionar más trabajo por segundo con la configuración dada.
+
+En conclusión:
+- Un **buen programador** mostrará **latencias de activación y solicitud bajas** con **RPS constantes**.
+- Un programador **menos eficiente** puede presentar **picos de latencia altos** o **valores de RPS inestables** con el tiempo.
+
+::nota
+Estos resultados pueden variar según la CPU, el número de núcleos, la carga del sistema y si el programador es capaz de gestionar la arquitectura de su CPU de forma eficiente.
+::
+
+### Recomendaciones para realizar benchmarks de juegos
+
+Si desea realizar benchmarks de juegos para comparar el rendimiento de diferentes programadores, aquí tiene algunos consejos para obtener los resultados más precisos:
+
+- **Utilice benchmarks integrados:** Muchos juegos modernos incluyen herramientas de benchmarking integradas. Estas están diseñadas para proporcionar resultados consistentes ejecutando la misma secuencia de eventos cada vez. - Consulta este [sitio web](https://www.pcgamingwiki.com/wiki/List_of_games_with_built-in_benchmarks) para ver una lista de juegos que incluyen benchmarks integrados.
+- **Configuración consistente:** Asegúrate de que la configuración del juego (resolución, calidad gráfica, etc.) sea la misma en cada ejecución de prueba.
+- **Cierra aplicaciones en segundo plano:** Otras aplicaciones ejecutándose en segundo plano pueden afectar el rendimiento. Cierra los programas innecesarios para minimizar su impacto.
+- Si no utilizas un benchmark integrado, intenta realizar las mismas acciones en el juego en cada ejecución de prueba. Esto podría incluir seguir la misma ruta, participar en escenarios de combate similares o realizar las mismas tareas.
+- Incluso no apuntar al mismo punto puede generar resultados de rendimiento diferentes.
+- **Ejecuciones múltiples:** Realiza varias ejecuciones del benchmark y calcula el promedio para tener en cuenta la variabilidad.
+- **Usa herramientas de monitorización del rendimiento:** Herramientas como MangoHud o GOverlay pueden proporcionar métricas de rendimiento en tiempo real, como FPS, tiempos de fotogramas y uso de CPU/GPU. - **Aprovecha los atajos de teclado o macros:**
+- Un ejemplo es crear una combinación de teclas que te permita cambiar entre diferentes programadores o sus modos sobre la marcha durante el juego.
+- Esto se puede hacer usando una herramienta como [scxctl](/configuration/sched-ext#how-to-launch-and-manage-the-scheduler) o creando scripts personalizados que cambien el programador activo y su modo.
+
+#### Subir y compartir tus benchmarks
+
+Este [sitio web](https://flightlesssomething.ambrosia.one/benchmarks) contiene una lista de benchmarks realizados por la comunidad usando diferentes programadores o probando diversas configuraciones.
+
+Para subir tus propios benchmarks, tendrás que vincular tu cuenta de Discord al sitio web y luego podrás enviarlos.
+
+Luego, haz clic en el botón "Nuevo benchmark" y completa la información requerida.
+
+- Puedes subir varios resultados para el mismo juego usando diferentes programadores o configuraciones. - Acepta registros de MangoHud y Afterburner.
+- Permite buscar por título o descripción.
 
 ## Transición de scx.service a scx_loader: Una guía completa
 
@@ -506,6 +849,9 @@ auto_mode = ["--performance"]
 
 ### Depuración en scx_loader
 
+<Tabs>
+<TabItem label='Registros simple'>
+
   - ```sh title='Comprobando el estado del servicio'
     systemctl status scx_loader.service
     ```
@@ -515,7 +861,9 @@ auto_mode = ["--performance"]
   - ```sh title='Viendo solo los registros de la sesión actual.'
     journalctl -u scx_loader.service -b 0
     ```
-- Registro avanzado
+
+</TabItem>
+<TabItem label='Registros extendidos'>
 
 *Para obtener un registro más detallado, siga estos pasos.*
   - ```sh title='Editar el archivo de servicio'
@@ -527,7 +875,10 @@ auto_mode = ["--performance"]
   - ```sh title='Reinicie el servicio'
      sudo systemctl restart scx_loader.service
      ```
-- Revise los registros de nuevo para obtener información de depuración más detallada.
+  - Revise los registros de nuevo para obtener información de depuración más detallada.
+</TabItem>
+
+</Tabs>
 
 ## Preguntas frecuentes
 
@@ -568,11 +919,16 @@ Asegúrese de que está utilizando la versión más reciente del paquete scx-sch
 
 ## Aprende más
 
-Si quiere aprender más sobre el framework sched-ext, eche un vistazo a los siguientes enlaces.
+:::note[Créditos]
+Algunos de los enlaces a continuación provienen originalmente del repositorio de GitHub sched-ext (https://github.com/sched-ext/scx?tab=readme-ov-file#sched_ext-schedulers-and-tools).
+Todo el crédito corresponde a los mantenedores y colaboradores de sched-ext por seleccionar y compartir estos excelentes recursos. :::
 
-- [Código fuente de los planificadores Sched-ext](<https://github.com/sched-ext/scx/tree/main/scheds/rust>)
-- [Wiki oficial de Sched-ext](<https://github.com/sched-ext/scx/wiki>)
-- [Changwoo Min: Introducción a sched-ext y a la Planificación de CPU Parte 1](<https://blogs.igalia.com/changwoo/sched-ext-a-bpf-extensible-scheduler-class-part-1/>)
-  - [Parte 2](<https://blogs.igalia.com/changwoo/sched-ext-scheduler-architecture-and-interfaces-part-2/>)
-- [Andrea Righi: Reimplementando mi planificador de Rust para Linux en eBPF](<https://arighi.blogspot.com/2024/08/re-implementing-my-linux-rust-scheduler.html>)
-- [Andrea Righi: Planificadores del kernel de Linux generados por IA en Rust](<https://arighi.blogspot.com/2024/09/ai-generated-linux-kernel-schedulers-in.html>)
+- [Lista de reproducción de YouTube Sched_ext](https://youtube.com/playlist?list=PLLLT4NxU7U1TnhgFH6k57iKjRu6CXJ3yB&si=DETiqpfwMoj8Anvl)
+- [LWN: La clase de programador extensible (febrero de 2023)](https://lwn.net/Articles/922405/)
+- [Blog de arighi: Implementa tu propio programador de CPU del kernel en Ubuntu con sched_ext (julio de 2023)](https://arighi.blogspot.com/2023/07/implement-your-own-cpu-scheduler-in.html)
+- [Charla de David Vernet: Recetas del kernel 2023 - sched_ext: programación conectable en el kernel de Linux (Septiembre de 2023)](https://youtu.be/8kAcnNVSAdI?si=F5Q-dkSS_sG9BTXA)
+- [Blog de Changwoo: sched_ext: una clase de planificador extensible con BPF (Parte 1) (Diciembre de 2023)](https://blogs.igalia.com/changwoo/sched-ext-a-bpf-extensible-scheduler-class-part-1/)
+- [Blog de arighi: Introducción al desarrollo de sched_ext (Abril de 2024)](https://arighi.blogspot.com/2024/04/getting-started-with-sched-ext.html)
+- [Blog de Changwoo: sched_ext: arquitectura e interfaces del planificador (Parte 2) (Junio ​​de 2023) 2024)](https://blogs.igalia.com/changwoo/sched-ext-scheduler-architecture-and-interfaces-part-2/)
+- [Canal de YouTube de arighi: Demostración del programador de Linux scx_bpfland: reconocimiento de topología (agosto de 2024)](https://youtu.be/R-FEZOveG-I)
+- [Charla de David Vernet: Recetas de Kernel 2024 - Programación con superpoderes: Uso de sched_ext para obtener grandes mejoras de rendimiento (septiembre de 2024)](https://youtu.be/Cy7-oqdcUCs?si=bjKu3uidOdIzzAWv)
